@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+	<session-factory>
+		<property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+		<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/sts3</property>
+		<property name="hibernate.connection.username">root</property>
+		<property name="hibernate.connection.password">root</property>
+ 		<property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+		<property name="show_sql">true</property>
+		<property name="format_sql">true</property>
+		<property name="hibernate.current_session_context_class">thread</property>
+		<property name="hibernate.c3p0.min_size">2</property>
+        <property name="hibernate.c3p0.max_size">125</property>
+        <property name="hibernate.c3p0.timeout">1800</property>
+        <property name="hibernate.c3p0.max_statements">500</property>
+		<!-- <property name="hbm2ddl.auto">create</property> -->  
+		
+		<mapping class="com.accenture.sts.entity.Application" />
+		<mapping class="com.accenture.sts.entity.Clarification" />
+		<mapping class="com.accenture.sts.entity.Dev_comment" />
+		<mapping class="com.accenture.sts.entity.Documentation" />
+		<mapping class="com.accenture.sts.entity.Employee" />
+		<mapping class="com.accenture.sts.entity.Tester_comment" />
+		<mapping class="com.accenture.sts.entity.Ticket" />
+		<mapping class="com.accenture.sts.entity.Upload_ticket" />
+	</session-factory>
+</hibernate-configuration>

@@ -1,0 +1,55 @@
+// For existing ticket
+
+DetachedCriteria crit = DetachedCriteria.forClass(Dev_comment.class); 
+		
+        crit.createAlias("ticket", "t", JoinType.LEFT_OUTER_JOIN);
+        crit.setProjection(Projections.max("date"));
+        crit.add(Restrictions.eqProperty("ticket.ticket_id","t.ticket_id"));
+		
+		Criteria criteria = session.createCriteria(Ticket.class);
+
+		criteria.setFetchMode("employee", FetchMode.JOIN);
+		criteria.createAlias("employee", "employee");
+		criteria.add(Restrictions.eq("employee.employee_id", emp_Id));
+		criteria.createAlias("dev_comment", "dev_comment", JoinType.LEFT_OUTER_JOIN, Subqueries.propertyEq("Ticket.ticket_id", crit));
+		criteria.createAlias("tester_comment", "tester_comment");
+		criteria.add(Restrictions.ne("dev_comment.status", "closed"));
+
+		ProjectionList projList = Projections.projectionList();
+		projList.add(Projections.property("ticket_id"));
+		projList.add(Projections.property("ticket_type"));
+		projList.add(Projections.property("ticket_desc"));
+		projList.add(Projections.property("application"));
+		projList.add(Projections.property("priority"));
+		projList.add(Projections.property("dev_comment.activity"));
+		projList.add(Projections.property("dev_comment.status"));
+		projList.add(Projections.property("tester_comment.tester"));
+		projList.add(Projections.property("dev_comment.comment_desc"));
+		projList.add(Projections.property("start_date"));
+		projList.add(Projections.max("dev_comment.comment_id"));
+		projList.add(Projections.groupProperty("ticket_id"));
+		criteria.setProjection(projList);
+		
+		
+		// For Newly added tickets
+		Criteria criteria1 = session.createCriteria(Ticket.class);
+
+		criteria1.add(Restrictions.isNull("start_date"));
+		criteria1.setFetchMode("employee", FetchMode.JOIN);
+		criteria1.createAlias("employee", "employee");
+		criteria1.add(Restrictions.eq("employee.employee_id", emp_Id));
+
+		ProjectionList projList1 = Projections.projectionList();
+		projList1.add(Projections.property("ticket_id"));
+		projList1.add(Projections.property("ticket_type"));
+		projList1.add(Projections.property("ticket_desc"));
+		projList1.add(Projections.property("application"));
+		projList1.add(Projections.property("priority"));
+		criteria1.setProjection(projList1);
+
+		List<Object[]> list1 = criteria1.list();
+		for (int i = 0; i < list1.size(); i++) {
+			list.add(list1.get(i));
+		}
+
+		System.out.println("TicketLis:" + list);

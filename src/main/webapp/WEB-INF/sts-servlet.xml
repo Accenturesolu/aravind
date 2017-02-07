@@ -1,0 +1,95 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:jee="http://www.springframework.org/schema/jee"
+    xmlns:lang="http://www.springframework.org/schema/lang"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+        http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<context:annotation-config />
+	<context:component-scan base-package="com.accenture.sts.controller">
+	</context:component-scan>
+
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+		id="jspViewResolver">
+		<property name="viewClass"
+			value="org.springframework.web.servlet.view.JstlView"></property>
+		<property name="prefix" value="/"></property>
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+	
+	<bean id="messageSource"
+        class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="basename" value="classpath:messages" />
+        <property name="defaultEncoding" value="UTF-8" />
+    </bean>
+    
+    <bean id="propertyConfigurer"
+	class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
+	p:location="/WEB-INF/database.properties" />
+	
+	 <bean id="dataSource"
+        class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
+        p:driverClassName="com.mysql.jdbc.Driver"
+        p:url="jdbc:mysql://localhost:3306/sts" p:username="root"
+        p:password="root" />
+	
+	<bean id="sessionFactory"
+        class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="configLocation">
+            <value>classpath:hibernate.cfg.xml</value>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+                <prop key="hibernate.show_sql">true</prop>
+            </props>
+        </property>
+        <property name="annotatedClasses">
+			<list>
+				<value>com.accenture.sts.entity.Application</value>
+				<value>com.accenture.sts.entity.Clarification</value>
+				<value>com.accenture.sts.entity.Dev_comment</value>
+				<value>com.accenture.sts.entity.Documentation</value>
+				<value>com.accenture.sts.entity.Employee</value>
+				<value>com.accenture.sts.entity.Tester_comment</value>
+				<value>com.accenture.sts.entity.Ticket</value>
+				<value>com.accenture.sts.entity.Upload_ticket</value>
+			</list>
+		</property>
+    </bean>
+	
+	<bean id="statusDAO" class="com.accenture.sts.dao.StatusDAOImpl"></bean>
+    <bean id="statusService" class="com.accenture.sts.service.StatusServiceImpl"></bean>
+    <bean id="resourceDAO" class="com.accenture.sts.dao.ResourceDAOImpl"></bean>
+    <bean id="resourceService" class="com.accenture.sts.service.ResourceServiceImpl"></bean>
+    <bean id="ticketDAO" class="com.accenture.sts.dao.TicketDAOImpl"></bean>
+    <bean id="ticketService" class="com.accenture.sts.service.TicketServiceImpl"></bean>
+    <bean id="loginDAO" class="com.accenture.sts.dao.LoginDAOImpl"></bean>
+    <bean id="loginService" class="com.accenture.sts.service.LoginServiceImpl"></bean>
+    <bean id="uploadDAO" class="com.accenture.sts.dao.UploadDAOImpl"></bean>
+    <bean id="uploadService" class="com.accenture.sts.service.UploadServiceImpl"></bean>
+	
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+    <bean id="transactionManager"
+        class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">          
+    <property name="maxUploadSize" value="20000000" />
+</bean>
+ 		
+</beans>

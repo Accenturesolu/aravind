@@ -1,0 +1,83 @@
+public List<Object[]> showDeleteTickets() {
+		List<Object[]> TicketList=null;
+try{
+		System.out.println("in showDeleteTickets dao");
+		sessionFactory = new Configuration().configure().buildSessionFactory();
+		Session session = sessionFactory.getCurrentSession();
+		session.beginTransaction();
+
+		
+		/*  DetachedCriteria inner = DetachedCriteria.forClass(Dev_comment.class, "inner")
+				   .createAlias("ticket", "tic")
+			        .setProjection(Projections.max("inner.date"))
+			        .add(Property.forName("inner.ticket_id").eq("tic.ticket_id"));
+		   
+
+			    Criteria crit = session.createCriteria(Ticket.class, "issue");
+
+			    // Add the join with an ON clause (I am not sure why you need the LEFT JOIN)
+			    crit.createAlias("dev_comment", "it", Criteria.LEFT_JOIN, 
+			        Subqueries.propertyEq("it.date", inner));
+
+			    // Specify the SELECT fields
+			    crit.add(Restrictions.ne("it.status", "closed"));
+
+			//    List<Object[]> rows = crit.list();
+*/		
+		DetachedCriteria innerCriteria = DetachedCriteria.forClass(Dev_comment.class, "inner")
+			    .setProjection(Projections.max("inner.date"));
+		
+		Criteria criteria= session.createCriteria(Ticket.class, "Ticket");
+		
+		criteria.createAlias("dev_comment", "inner",JoinType.LEFT_OUTER_JOIN, Subqueries.propertyEq("Ticket.ticket_id", innerCriteria));
+		
+//		criteria.add(Subqueries.propertyEq("q1.ticket_id", innerCriteria ));
+		criteria.add(Restrictions.ne("inner.status", "closed"));
+		
+		/*
+		Criteria criteria = session.createCriteria(Ticket.class, "Ticket");
+		
+		Criterion crit = Restrictions.eqProperty("Ticket.ticket_id","ticket.ticket_id");
+		crit.setProjection(Projections.max("date"));
+		
+//		Criterion crit = Criterion.forClass(Dev_comment.class);
+
+		criteria.setFetchMode("dev_comment", FetchMode.JOIN);
+		criteria.createAlias("dev_comment", "dev_comment",JoinType.LEFT_OUTER_JOIN);
+
+		criteria.add(Restrictions.ne("dev_comment.status", "closed"));*/
+
+//		Criteria crit = session.createCriteria(Dev_comment.class);
+//		crit.setProjection(Projections.max("date"));
+		//criteria.add(Restrictions.sqlRestriction("Date=(select max(Date) from Dev_Comment where Ticket_ID=dev_comment.Ticket_ID)"));
+
+		/*DetachedCriteria crit = DetachedCriteria.forClass(Dev_comment.class); 
+		
+        crit.createAlias("ticket", "t", JoinType.LEFT_OUTER_JOIN);
+        crit.setProjection(Projections.max("date"));
+        crit.add(Restrictions.eqProperty("ticket.ticket_id","t.ticket_id"));
+ //       crit.add(Restrictions.ne("status", "closed"));
+
+        Criteria criteria = session.createCriteria(Ticket.class, "Ticket");
+        criteria.createAlias("dev_comment", "dev_comment", JoinType.LEFT_OUTER_JOIN, Subqueries.propertyEq("Ticket.ticket_id", crit));
+        criteria.add(Restrictions.ne("dev_comment.status", "closed"));*/
+		
+		ProjectionList projList = Projections.projectionList();
+
+		projList.add(Projections.property("Ticket.ticket_id"));
+		projList.add(Projections.property("Ticket.ticket_desc"));
+		projList.add(Projections.property("Ticket.application"));
+		projList.add(Projections.max("inner.comment_id"));
+		projList.add(Projections.groupProperty("ticket_id"));
+		criteria.setProjection(projList);
+		
+		TicketList = criteria.list();
+		//System.out.println(TicketList);
+
+		session.getTransaction().commit();
+		
+} catch(Exception e){
+	e.printStackTrace();
+}
+		return TicketList;
+	}
